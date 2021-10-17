@@ -1,22 +1,29 @@
 from djitellopy import tello
 import KeyPressModel as kp
-import time
-import cv2
+from time import sleep
 
-global img
+######## Parameters ##########
+fSpeed = 117/10 # forward speed in cm/s (15cm/s)
+aSpeed = 360/10 # Angular Speed Degrees/s (45c/s)
+interval = 0.25
+
+dInterval = fSpeed*interval
+aInterval = aSpeed*interval
+
+#################################
+
+
 kp.init()
 me = tello.Tello()
 me.connect()
 print(me.get_battery())
-
-me.streamon()
 
 
 def getKeyboardInput():
     lr, fb, ud, yv = 0,0,0,0
     speed = 10
 
-    if kp.getKey("LEFT"): lr = -speed
+    if kp.getKey("LEFT"): lr  -speed
     elif kp.getKey("RIGHT"): lr = speed
 
     if kp.getKey("UP"): fb = -speed
@@ -28,19 +35,11 @@ def getKeyboardInput():
     if kp.getKey("a"): yv = -speed
     elif kp.getKey("d"): yv = speed
 
-    if kp.getKey('q'): yv = me.land(); time.sleep(3)
+    if kp.getKey('q'): yv = me.land()
     if kp.getKey('e'): yv = me.takeoff()
 
-    if kp.getKey('z'):
-        cv2.imwrite(f'Resource/Images/{time.time()}.jpg', img) # storage the img as jgp
-        time.sleep(0.3) # add delay, for one shot
     return [lr, fb, ud, yv]
 
 while True:
     vals = getKeyboardInput()
     me.send_rc_control(vals[0],vals[1],vals[2],vals[3])
-
-    img = me.get_frame_read().frame
-    img = cv2.resize(img, (360,240))
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
