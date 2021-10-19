@@ -2,6 +2,7 @@ from djitellopy import tello
 import KeyPressModel as kp
 from time import sleep
 import numpy as np
+import cv2
 
 ######## Parameters ##########
 fSpeed = 117/10 # forward speed in cm/s (15cm/s)
@@ -41,11 +42,19 @@ def getKeyboardInput():
 
     return [lr, fb, ud, yv]
 
+def drawPoints():
+    cv2.circle(img,(300,500), 20, (0,0,255), cv2.FILLED)
+
+
 while True:
     vals = getKeyboardInput()
     try:
         me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
     except:
-        print('take off')
+        print('no action avilable')
 
     img = np.zeros((1000,1000,3), np.uint8) # un set integer 8
+    # 2^8 = 256 = 0-255
+    drawPoints()
+    cv2.imshow("output", img)
+    cv2.waitKey(1)
