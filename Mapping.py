@@ -61,11 +61,11 @@ def getKeyboardInput():
 
     if kp.getKey("a"):
         yv = -speed
-        yaw += aInterval
+        yaw -= aInterval
 
     elif kp.getKey("d"):
         yv = speed
-        yaw -= aInterval
+        yaw += aInterval
 
 
     if kp.getKey('q'):
@@ -82,7 +82,8 @@ def getKeyboardInput():
     return [lr, fb, ud, yv, x, y]
 
 def drawPoints(img, points):
-    cv2.circle(img,(points[0], points[1]), 5, (0,0,255), cv2.FILLED)
+    for point in points:
+        cv2.circle(img,point, 5, (0,0,255), cv2.FILLED)
 
 
 while True:
@@ -95,7 +96,7 @@ while True:
 
     img = np.zeros((1000,1000,3), np.uint8) # un set integer 8
     # 2^8 = 256 = 0-255
-    points = (vals[4],vals[5])
+    points.append((vals[4],vals[5]))
     drawPoints(img, points)
     cv2.imshow("output", img)
     cv2.waitKey(1)
