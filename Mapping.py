@@ -3,6 +3,7 @@ import KeyPressModel as kp
 from time import sleep
 import numpy as np
 import cv2
+import math
 
 ######## Parameters ##########
 fSpeed = 117/10 # forward speed in cm/s (15cm/s)
@@ -13,6 +14,9 @@ dInterval = fSpeed*interval
 aInterval = aSpeed*interval
 
 #################################
+x,y = 500,500
+a = 0
+yaw = 0
 
 
 kp.init()
@@ -22,32 +26,63 @@ print(me.get_battery())
 
 
 def getKeyboardInput():
-    lr, fb, ud, yv = 0,0,0,0
+    lr, fb, ud, yv = 0, 0, 0, 0
     speed = 50
+    d = 0
+    global yaw, x, y, a
 
-    if kp.getKey("LEFT"): lr = -speed
-    elif kp.getKey("RIGHT"): lr = speed
+    if kp.getKey("LEFT"):
+        lr = -speed
+        d = dInterval
+        a = -180
+    elif kp.getKey("RIGHT"):
+        lr = speed
+        d = -dInterval
+        a = 180
 
-    if kp.getKey("UP"): fb = speed
-    elif kp.getKey("DOWN"): fb = -speed
+    if kp.getKey("UP"):
+        fb = speed
+        d = dInterval
+        a = 270
 
-    if kp.getKey("w"): ud = speed
-    elif kp.getKey("s"): ud = -speed
+    elif kp.getKey("DOWN"):
+        fb = -speed
+        d = -dInterval
+        a = -90
 
-    if kp.getKey("a"): yv = -speed
-    elif kp.getKey("d"): yv = speed
+    if kp.getKey("w"):
+        ud = speed
+        yaw += aInterval
 
-    if kp.getKey('q'): yv = me.land()
-    if kp.getKey('e'): yv = me.takeoff()
+    elif kp.getKey("s"):
+        ud = -speed
+        yaw -= aInterval
 
-    return [lr, fb, ud, yv]
+    if kp.getKey("a"):
+        yv = -speed
+    elif kp.getKey("d"):
+        yv = speed
 
-def drawPoints():
-    cv2.circle(img,(300,500), 20, (0,0,255), cv2.FILLED)
+    if kp.getKey('q'):
+        yv = me.land()
+    if kp.getKey('e'):
+        yv = me.takeoff()
+
+    sleep(0.25) # same time of interval
+    a += yaw
+    x += int(d*math.cos(math.radians(a)))
+    y += int(d*math.sin(math.radians(a)))
+
+
+    return [lr, fb, ud, yv, x, y]
+
+def drawPoints(img, points):
+    cv2.circle(img,(points[0], points[1]), 5, (0,0,255), cv2.FILLED)
 
 
 while True:
     vals = getKeyboardInput()
+    print(a)
     try:
         me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
     except:
@@ -55,6 +90,7 @@ while True:
 
     img = np.zeros((1000,1000,3), np.uint8) # un set integer 8
     # 2^8 = 256 = 0-255
-    drawPoints()
+    points = (vals[4],vals[5])
+    drawPoints(img, points)
     cv2.imshow("output", img)
     cv2.waitKey(1)
