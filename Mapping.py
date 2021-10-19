@@ -15,7 +15,7 @@ aInterval = aSpeed*interval
 
 
 #################################
-x,y = 500,500
+x,y = 150,150
 a = 0
 yaw = 0
 
@@ -30,7 +30,8 @@ points = []
 
 def getKeyboardInput():
     lr, fb, ud, yv = 0, 0, 0, 0
-    speed = 50
+    speed = 15
+    aspeed = 50
     d = 0
     global yaw, x, y, a
 
@@ -60,11 +61,11 @@ def getKeyboardInput():
 
 
     if kp.getKey("a"):
-        yv = -speed
+        yv = -aspeed
         yaw -= aInterval
 
     elif kp.getKey("d"):
-        yv = speed
+        yv = aspeed
         yaw += aInterval
 
 
@@ -83,8 +84,12 @@ def getKeyboardInput():
 
 def drawPoints(img, points):
     for point in points:
-        cv2.circle(img,point, 5, (0,0,255), cv2.FILLED)
+        cv2.circle(img,point,1,(0,255,0), cv2.FILLED)
+        cv2.circle(img,point, 1, (0,0,255), cv2.FILLED)
 
+    cv2.putText(img, f'({points[-1][0]-150},{points[-1][1 ]-150})cm',
+                (points[-1][0]+10, points[-1][1]+30), cv2.FONT_HERSHEY_PLAIN,1,(255,0,255),1)
+    #print position with label
 
 while True:
     vals = getKeyboardInput()
@@ -94,7 +99,7 @@ while True:
     except:
         print('no action avilable')
 
-    img = np.zeros((1000,1000,3), np.uint8) # un set integer 8
+    img = np.zeros((300,300,3), np.uint8) # un set integer 8
     # 2^8 = 256 = 0-255
     points.append((vals[4],vals[5]))
     drawPoints(img, points)
