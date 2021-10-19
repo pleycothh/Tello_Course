@@ -13,6 +13,7 @@ interval = 0.25
 dInterval = fSpeed*interval
 aInterval = aSpeed*interval
 
+
 #################################
 x,y = 500,500
 a = 0
@@ -23,6 +24,8 @@ kp.init()
 me = tello.Tello()
 me.connect()
 print(me.get_battery())
+
+points = []
 
 
 def getKeyboardInput():
@@ -52,16 +55,18 @@ def getKeyboardInput():
 
     if kp.getKey("w"):
         ud = speed
-        yaw += aInterval
-
     elif kp.getKey("s"):
         ud = -speed
-        yaw -= aInterval
+
 
     if kp.getKey("a"):
         yv = -speed
+        yaw += aInterval
+
     elif kp.getKey("d"):
         yv = speed
+        yaw -= aInterval
+
 
     if kp.getKey('q'):
         yv = me.land()
